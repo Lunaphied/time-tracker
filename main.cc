@@ -5,9 +5,11 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 #include <string>
 
 Gtk::Label* clock_label = nullptr;
+Gtk::Label* diff_label = nullptr;
 Gtk::Label* status_label = nullptr;
 Gtk::TextView* log_textview = nullptr;
 
@@ -16,7 +18,10 @@ Pango::AttrColor green_attr = Pango::Attribute::create_attr_foreground(0x8a8a, 0
 Pango::AttrColor red_attr = Pango::Attribute::create_attr_foreground(0xefef, 0x2929, 0x2929);
 
 void fill_in_time();
+bool clock_update();
+
 char* time_string = new char[256];
+char* diff_string = new char[256];
 
 // Abstract away getting the time since the epoch
 // TODO: is this use of std::chrono well defined?
@@ -28,6 +33,10 @@ int64_t time_since_epoch() {
 
 	return seconds.count();
 }
+
+// XXX: These are all hacks to avoid properly os-dependant time gathering calls
+// we just keep 2 copies of the times in the 2 different formats
+time_t in_time_c = -1;
 
 int64_t in_time = -1;
 int64_t out_time = -1;
@@ -42,6 +51,7 @@ std::stringstream log_sstream;
 // TODO: This should use exceptions to report errors
 // TODO: use an enum to represent the stamp to use
 // TODO: This should update the log too
+// TODO: Switch to a format where each line represents an event rather than a session
 void stamp_file(bool stamp_in) {
 	fill_in_time();
 	if (stamp_in) {
@@ -59,12 +69,17 @@ void punch_in() {
 		std::cout << "Punched in: " << time_string << std::endl;
 		punched_in = true;
 		in_time = time_since_epoch();
+		in_time_c = time(0);
+
 		stamp_file(true);
 
 		Pango::AttrList attribs = status_label->get_attributes();
 		attribs.change(green_attr);
 		status_label->set_text(Glib::ustring("IN"));
 		status_label->set_attributes(attribs);
+		
+		// XXX: This is hacky, but allows the diff label to appear right away
+		clock_update();
 	} else {
 		std::cout << "Already punched in" << std::endl;
 	}
@@ -75,12 +90,16 @@ void punch_out() {
 		std::cout << "Punched out: " << time_string << std::endl;
 		punched_in = false;
 		out_time = time_since_epoch();
+
 		stamp_file(false);
 		
 		Pango::AttrList attribs = status_label->get_attributes();
 		attribs.change(red_attr);
 		status_label->set_text(Glib::ustring("OUT"));
 		status_label->set_attributes(attribs);
+
+		// XXX: This is hacky, but allows the diff label to disappear right away
+		clock_update();
 	} else {
 		std::cout << "Not punched in" << std::endl;
 	}
@@ -96,11 +115,30 @@ void fill_in_time() {
 	timeinfo = localtime(&rawtime);
 
 	strftime(time_string, 256, "%F %r", timeinfo);
+
+	if (punched_in) {
+		// Handle updating the diff_string when punched in
+		time_t timer;
+		time(&timer);
+		int64_t seconds = difftime(timer,in_time_c);
+		int seconds_place = seconds % 60;
+		int minutes_place = seconds / 60;
+		int hours_place = seconds / (3600);
+		snprintf(diff_string, 256, "%02d hours, %02d minutes and %02d seconds", hours_place, \
+				minutes_place, seconds_place);
+	}
 }
 
+// Handles updating both the wallclock and the wallclock diff
 bool clock_update() {
 	fill_in_time();
 	clock_label->set_text(Glib::ustring(time_string));
+	if (punched_in) {
+		diff_label->set_text(Glib::ustring(diff_string));
+	} else {
+		diff_label->set_text(Glib::ustring("N/A"));
+	}
+
 	return true;
 }
 
@@ -110,7 +148,10 @@ int main(int argc, char *argv[]) {
 
 	// TODO: This should be smarter about append/overwrite
 	if (!log_output) {
-		log_output = new std::ofstream(filename.c_str());
+		log_output = new std::ofstream(filename.c_str(), std::ofstream::app);
+		// Always append a line in case the punch out didn't happen
+		// TODO: Cleanup with a punch out/special unpunched time record
+		*log_output << std::endl;
 	}
 
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
@@ -135,8 +176,10 @@ int main(int argc, char *argv[]) {
 		// TODO: Is there a better place for this?
 		fill_in_time();
 
+		// Both are required by clock_update()
+		refBuilder->get_widget("worked_time", diff_label);
 		refBuilder->get_widget("current_time", clock_label);
-		if (clock_label) {
+		if (clock_label && diff_label) {
 			// Using connect_second at interval of 1 might save battery, but will lead
 			// to an inaccurate clockface
 			Glib::signal_timeout().connect(sigc::ptr_fun(&clock_update), 500);
@@ -167,6 +210,7 @@ int main(int argc, char *argv[]) {
 	delete window;
 	delete log_output;
 	delete[] time_string;
+	delete[] diff_string;
 
 	return 0;
 }
