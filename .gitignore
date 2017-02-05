@@ -2,4 +2,8 @@ ttrack
 *~
 *.swp
 *.o
+\#*
+
+# This is program output
+timesheet.tsv
 
