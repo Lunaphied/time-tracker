@@ -2,19 +2,6 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec ullamcorper augue. Aenean imperdiet, nisl vitae iaculis pellentesque, ligula orci efficitur mi, ut convallis eros tortor vel velit. Fusce et ex fermentum, vulputate arcu a, volutpat dui. Duis consequat turpis a sapien malesuada, nec euismod ante vestibulum. Vestibulum blandit tincidunt ante. Nam scelerisque auctor ante vel efficitur. In interdum arcu at leo tristique, et scelerisque massa convallis. Ut pharetra mi vitae scelerisque mollis. Suspendisse vitae neque enim. Cras eget maximus nunc, eu pretium quam. Etiam at nulla et nibh hendrerit pulvinar. Mauris pellentesque fringilla neque, at hendrerit diam imperdiet a. Morbi gravida, sem sed porttitor volutpat, lorem augue ultrices velit, id gravida metus nibh nec enim. Mauris quis tempor risus, sed posuere turpis. Nam ac lacinia sem. Aenean sagittis odio vel nisl lobortis, at finibus turpis tincidunt.
-
-Nam laoreet suscipit lacus, eget suscipit urna scelerisque id. Nulla auctor lacus vel felis pretium, ac laoreet augue iaculis. Mauris dignissim orci eu elit ornare viverra. Mauris pretium euismod urna id interdum. Integer nunc lectus, malesuada eget pretium sed, placerat non mi. Nullam nec sodales orci. Vestibulum at enim eget ex fringilla vulputate. Quisque eget ipsum eleifend, venenatis ligula ut, lobortis ante. Suspendisse potenti.
-
-Praesent suscipit imperdiet porta. Suspendisse venenatis ante in ex venenatis convallis sed vitae libero. Nunc massa elit, venenatis nec mollis vitae, maximus ultricies risus. Morbi ut aliquam lorem. Cras eget sapien sit amet nunc tempor venenatis nec id sem. Nam tincidunt convallis consequat. In vel velit et odio interdum fermentum.
-
-Nunc sollicitudin accumsan magna, vitae aliquet velit gravida non. Vestibulum facilisis velit sit amet orci facilisis lacinia. Nullam viverra elit nec eros ullamcorper finibus. Sed at libero tempor, congue velit quis, porta ex. Morbi ut suscipit augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc iaculis ante dui, quis tempus mi fermentum non. Aliquam egestas gravida elit. Mauris efficitur commodo laoreet. Morbi sit amet nisi sit amet metus malesuada elementum. Donec ipsum eros, viverra nec mi nec, pellentesque aliquam lacus. Sed vestibulum aliquet molestie.
-
-Etiam finibus orci quam, in sagittis lorem volutpat non. Fusce nec urna eget ipsum cursus cursus in eget quam. Aliquam sollicitudin orci id leo finibus, eu ullamcorper dolor elementum. Nulla ut diam a massa cursus molestie at eu velit. In faucibus nisl sed magna aliquam eleifend. Aenean in nisi ut sapien tincidunt pharetra id vel felis. Curabitur sagittis lorem accumsan velit viverra molestie. Nunc quis tellus felis. Pellentesque gravida, erat a porta imperdiet, felis tortor consectetur ipsum, nec dapibus urna orci eu justo. Donec aliquet enim quis felis ullamcorper dapibus. Vestibulum suscipit tincidunt ultrices. Aenean nec sapien tortor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis sodales condimentum tortor et blandit. Aliquam felis tellus, semper vel sollicitudin sit amet, venenatis eu ligula. Suspendisse sed convallis turpis, in interdum nisl. </property>
-  </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <property name="default_width">440</property>
@@ -211,7 +198,6 @@ Etiam finibus orci quam, in sagittis lorem volutpat non. Fusce nec urna eget ips
                 <property name="can_focus">True</property>
                 <property name="editable">False</property>
                 <property name="wrap_mode">word-char</property>
-                <property name="buffer">textbuffer1</property>
                 <property name="monospace">True</property>
               </object>
             </child>
