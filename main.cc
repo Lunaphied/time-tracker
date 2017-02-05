@@ -4,16 +4,19 @@
 #include <gtkmm.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 Gtk::Label* clock_label = nullptr;
 Gtk::Label* status_label = nullptr;
+Gtk::TextView* log_textview = nullptr;
 
 // TODO: This should be done with styles probably
 Pango::AttrColor green_attr = Pango::Attribute::create_attr_foreground(0x8a8a, 0xe2e2, 0x3434);
 Pango::AttrColor red_attr = Pango::Attribute::create_attr_foreground(0xefef, 0x2929, 0x2929);
 
-char* time_string = new char[128];
+void fill_in_time();
+char* time_string = new char[256];
 
 // Abstract away getting the time since the epoch
 // TODO: is this use of std::chrono well defined?
@@ -32,15 +35,23 @@ bool punched_in = false;
 
 std::ofstream* log_output = nullptr;
 
+// TODO: We could probably do better by natively interacting with the textview's buffer
+// this is just used for easy conversion
+std::stringstream log_sstream;
+
 // TODO: This should use exceptions to report errors
 // TODO: use an enum to represent the stamp to use
 // TODO: This should update the log too
 void stamp_file(bool stamp_in) {
+	fill_in_time();
 	if (stamp_in) {
 		*log_output << in_time;
+		log_sstream << time_string;
 	} else {
 		*log_output << '\t' << out_time << std::endl;
+		log_sstream << '\t' << time_string << std::endl;
 	}
+	log_textview->get_buffer()->set_text(Glib::ustring(log_sstream.str()));
 }
 
 void punch_in() {
@@ -84,7 +95,7 @@ void fill_in_time() {
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
 
-	strftime(time_string, 128, "%r", timeinfo);
+	strftime(time_string, 256, "%F %r", timeinfo);
 }
 
 bool clock_update() {
@@ -134,6 +145,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		refBuilder->get_widget("status", status_label);
+		refBuilder->get_widget("timestamp_log", log_textview);
 
 		Gtk::Button* punch_in_button = nullptr;
 		refBuilder->get_widget("in", punch_in_button);
@@ -154,7 +166,7 @@ int main(int argc, char *argv[]) {
 
 	delete window;
 	delete log_output;
-	delete time_string;
+	delete[] time_string;
 
 	return 0;
 }
